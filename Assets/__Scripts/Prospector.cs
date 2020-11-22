@@ -90,7 +90,102 @@ public class Prospector : MonoBehaviour {
 			cp.slotDef = tSD;
 
 			cp.state = eCardState.tableau;
+			cp.SetSortingLayerName(tSD.layerName);
 			tableau.Add(cp);
         }
+		MoveToTarget(Draw());
+		UpdateDrawPile();
+    }
+
+	void MoveToDiscard (CardProspector cd)
+    {
+		cd.state = eCardState.discard;
+		discardPile.Add(cd);
+		cd.transform.parent = layoutAnchor;
+
+		cd.transform.localPosition = new Vector3(
+			layout.multiplier.x * layout.discardPile.x,
+			layout.multiplier.y * layout.discardPile.y,
+			-layout.discardPile.layerID + 0.5f);
+		cd.faceUp = true;
+
+		cd.SetSortingLayerName(layout.discardPile.layerName);
+		cd.SetSortOrder(-100 + discardPile.Count);
+    }
+
+	void MoveToTarget(CardProspector cd)
+    {
+		if (target != null) MoveToDiscard(target);
+		target = cd;
+		cd.state = eCardState.target;
+		cd.transform.parent = layoutAnchor;
+		cd.transform.localPosition = new Vector3(
+			layout.multiplier.x * layout.discardPile.x,
+			layout.multiplier.y * layout.discardPile.y,
+			-layout.discardPile.layerID);
+
+		cd.faceUp = true;
+		cd.SetSortingLayerName(layout.discardPile.layerName);
+		cd.SetSortOrder(0);
+    }
+
+	void UpdateDrawPile()
+    {
+		CardProspector cd;
+		for (int i=0; i<drawPile.Count; i++)
+        {
+			cd = drawPile[i];
+			cd.transform.parent = layoutAnchor;
+			Vector2 dpStagger = layout.drawPile.stagger;
+			cd.transform.localPosition = new Vector3(
+			layout.multiplier.x * (layout.drawPile.x + i * dpStagger.x),
+			layout.multiplier.y * (layout.drawPile.y + i * dpStagger.y),
+			-layout.drawPile.layerID+0.1f*i);
+
+			cd.faceUp = false;
+			cd.state = eCardState.drawpile;
+
+			cd.SetSortingLayerName(layout.drawPile.layerName);
+			cd.SetSortOrder(-10 * i);
+        }
+    }
+
+	public void CardClicked(CardProspector cd)
+    {
+        switch(cd.state){
+			case eCardState.target:
+				break;
+			case eCardState.drawpile:
+				MoveToDiscard(target);
+				MoveToTarget(Draw());
+				UpdateDrawPile();
+				break;
+			case eCardState.tableau:
+				bool validMatch = true;
+                if (!cd.faceUp)
+                {
+					validMatch = false;
+                }
+                if (!AdjacentRank(cd, target))
+                {
+					validMatch = false;
+                }
+				if (!validMatch) return;
+				tableau.Remove(cd);
+				MoveToTarget(cd);
+				break;
+        }
+    }
+
+	public bool AdjacentRank(CardProspector c0, CardProspector c1)
+    {
+		if (!c0.faceUp || !c1.faceUp) return (false);
+		if(Mathf.Abs(c0.rank - c1.rank) == 1)
+        {
+			return (true);
+        }
+		if (c0.rank == 1 && c1.rank == 13) return (true);
+		if (c0.rank == 13 && c1.rank == 1) return (true);
+		return (false);
     }
 }
