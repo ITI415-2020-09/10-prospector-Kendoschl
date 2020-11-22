@@ -40,7 +40,7 @@ public class Prospector : MonoBehaviour {
 
 	void SetUpUITexts()
     {
-		GameObject go = GameObject.Find("highScore");
+		GameObject go = GameObject.Find("HighScore");
 		if (go != null)
         {
 			highScoreText = go.GetComponent<Text>();
