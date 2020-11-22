@@ -18,6 +18,12 @@ public class CardProspector : Card{
     public int layoutID;
     public SlotDef slotDef;
 
+    public override void OnMouseAsButton()
+    {
+        Prospector.S.CardClicked(this);
+        base.OnMouseAsButton();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
