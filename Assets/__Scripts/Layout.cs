@@ -56,7 +56,7 @@ public class Layout : MonoBehaviour
             switch (tSD.type)
             {
                 case "slot":
-                    tSD.faceUp = (slotsX[i].att("faceup") == "l");
+                    tSD.faceUp = (slotsX[i].att("faceup") == "1");
                     tSD.id = int.Parse(slotsX[i].att("id"));
                     if (slotsX[i].HasAtt("hiddenby"))
                     {
@@ -70,15 +70,6 @@ public class Layout : MonoBehaviour
                     break;
             }
         }
-        void Start()
-        {
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
+       
     }
 }
